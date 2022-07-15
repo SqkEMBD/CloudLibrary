@@ -1,0 +1,13 @@
+14:28:45:861	< Command: AA 00 03 02 00 5D 9E 
+14:28:45:892	> Event: AA 00 03 00 02 00 FB 
+Command Complete.
+14:28:46:830	> Event: AA 00 03 01 01 00 FB 
+14:28:46:830	< Command: AA 00 02 14 01 E9 
+Device is under pairing mode
+14:28:46:845	> Event: AA 00 03 24 1D 01 BB 
+14:28:46:845	< Command: AA 00 02 14 24 C6 
+14:28:46:861	> Event: AA 00 03 2D 05 07 C4 
+14:28:46:861	< Command: AA 00 02 14 2D BD 
+14:28:47:258	> Event: AA 00 03 24 1D 00 BC 
+14:28:47:258	< Command: AA 00 02 14 24 C6 
+

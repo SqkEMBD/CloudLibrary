@@ -1,0 +1,5 @@
+14:50:24:711	< Command: AA 00 02 07 12 E5 
+14:50:24:728	> Event: AA 00 03 00 07 03 F3 
+Parameter Error					time 1 * 30 secs
+08:51:17:068	< Command: AA 00 02 07 01 F6 
+08:51:31:780	< Command: AA 00 02 07 02 F5

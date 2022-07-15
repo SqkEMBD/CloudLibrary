@@ -1,0 +1,52 @@
+09:30:36:639	< Command: AA 00 02 39 00 C5 
+09:30:49:477	< Command: AA 00 02 44 04 B6 
+09:31:01:988	< Command: AA 00 02 32 00 CC 
+09:31:14:494	< Command: AA 00 02 08 00 F6 
+09:31:27:178	< Command: AA 00 02 0E 00 F0 
+09:31:27:209	< Command: AA 00 02 10 00 EE 
+09:31:27:240	< Command: AA 00 02 0F 00 EF 
+09:31:27:271	< Command: AA 00 02 08 00 F6 
+09:31:27:302	< Command: AA 00 02 08 01 F5 
+09:31:27:326	< Command: AA 00 03 16 00 00 E7 
+09:31:27:358	< Command: AA 00 03 16 00 01 E6 
+09:31:27:389	< Command: AA 00 03 16 00 02 E5 
+09:31:27:420	< Command: AA 00 03 16 00 03 E4 
+09:31:27:452	< Command: AA 00 02 0D 00 F1 
+09:31:27:483	< Command: AA 00 02 42 00 BC 
+
+AA 00 02 39 00 C5 
+AA 00 02 44 04 B6 
+AA 00 02 32 00 CC 
+AA 00 02 08 00 F6 
+AA 00 02 0E 00 F0 
+AA 00 02 10 00 EE 
+AA 00 02 0F 00 EF 
+AA 00 02 08 00 F6 
+AA 00 02 08 01 F5 
+AA 00 03 16 00 00 E7 
+AA 00 03 16 00 01 E6 
+AA 00 03 16 00 02 E5 
+AA 00 03 16 00 03 E4 
+AA 00 02 0D 00 F1 
+AA 00 02 42 00 BC 
+
+Operation Code | Parameters | Sub-parameter | ... | ... | ....
+23 00 0F 01 FF FF FF VOL+
+23 00 0F 02 FF FF FF VOL-
+
+
+Command (0x05 Change_device_name)
+
+Cloud BT-1 [Product Name Field]
+43 6C 6F 75 64 20 42 54 2D 31 
+10 chars 0A
+
+# 00 [Bluetooth idents Name Field]
+20 23 30 30
+4 chars 04
+
+AA 00 05 0E 43 6C 6F 75 64 20 42 54 2D 31 20 23 30 30 4E
+
+
+MASTER RESET
+02 00 56 00

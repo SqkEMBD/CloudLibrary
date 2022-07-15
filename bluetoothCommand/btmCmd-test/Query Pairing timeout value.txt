@@ -1,0 +1,6 @@
+14:36:20:194	< Command: AA 00 03 24 00 00 D9 
+14:36:20:225	> Event: AA 00 03 00 24 00 D9 
+Command Complete.
+14:36:20:225	> Event: AA 00 03 2E 00 0A C5 
+14:36:20:225	< Command: AA 00 02 14 2E BC 
+Pairing timeout value is 300seconds.

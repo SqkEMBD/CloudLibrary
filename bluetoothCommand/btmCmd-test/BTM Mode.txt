@@ -1,0 +1,2 @@
+08:53:52:370	< Command: AA 00 03 13 03 00 E7 inactive
+08:53:53:770	< Command: AA 00 03 13 03 01 E6 resume

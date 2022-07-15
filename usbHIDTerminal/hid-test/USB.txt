@@ -1,0 +1,80 @@
+static int8_t CUSTOM_HID_OutEvent_FS(uint8_t* state)
+{
+	/* USER CODE BEGIN 6 */
+
+	int8_t string_size;
+	string_size = charatercount(state);
+
+	uint8_t buffer[string_size];
+	memcpy(buffer, state, string_size);
+
+	HAL_UART_Transmit(&huart1, (uint8_t*)buffer, string_size, 100); // BTM Command
+	USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS,(uint8_t*)buffer,64); // PC HID Terminal
+
+	return (0);
+  /* USER CODE END 6 */
+}
+
+/* USER CODE BEGIN 7 */
+/**
+  * @brief  Send the report to the Host
+  * @param  report: The report to be sent
+  * @param  len: The report length
+  * @retval USBD_OK if all operations are OK else USBD_FAIL
+  */
+/*
+static int8_t USBD_CUSTOM_HID_SendReport_FS(uint8_t *report, uint16_t len)
+{
+  return USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, report, len);
+}
+*/
+/* USER CODE END 7 */
+
+/* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
+
+
+static int8_t charatercount(uint8_t* string)
+{
+	uint8_t buffer[64]; // maximum size of string
+	int8_t charscounter = 0;
+
+	memcpy(buffer,string,64);
+
+	for(int i = 0; i < sizeof(buffer); i++)
+	{
+		if(buffer[i] != '\0')
+		{
+			charscounter++;
+		}
+	}
+	return charscounter;
+}
+
+// Simulate Change BTM Name
+// Set BTM Device name
+void BTM_Set_Device_Name()
+{
+
+    uint8_t command[19];
+    command[0]=0xAA; // Header 0
+    command[1]=0x00; // Header 1
+    command[2]=0x0E; // Payload length
+    command[3]=0x05; // Command ID
+    command[4]=0x43; // 'C'
+    command[5]=0x6C; // 'l;
+    command[6]=0x6F; // 'o'
+    command[7]=0x75; // 'u'
+    command[8]=0x64; // 'd'
+    command[9]=0x20; // ' '
+    command[10]=0x42; // 'B'
+    command[11]=0x54; // 'T'
+    command[12]=0x2D; // '-'
+    command[13]=0x31; // '1'
+    command[14]=0x20; // ' '
+    command[15]=0x23; // '#'
+    command[16]=0x31; // '1'
+    command[17]=0x20; // ' ' // reserved space for 2 digits ID character
+    command[18]=calculateChecksum(&command[2], &command[17]);
+    MCU_UART_sendData(&command[0], 18);
+
+}

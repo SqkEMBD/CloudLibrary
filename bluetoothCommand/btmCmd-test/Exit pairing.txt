@@ -1,0 +1,6 @@
+14:29:14:632	< Command: AA 00 03 02 00 6B 90 
+14:29:14:663	> Event: AA 00 03 00 02 00 FB 
+Command Complete.
+14:29:14:663	> Event: AA 00 03 01 04 02 F6 
+14:29:14:663	< Command: AA 00 02 14 01 E9 
+Device is pairing failed.

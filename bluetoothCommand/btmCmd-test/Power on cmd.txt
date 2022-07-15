@@ -1,0 +1,48 @@
+14:29:54:636	< Command: AA 00 03 02 00 51 AA // power button pressed
+14:29:54:636	< Command: AA 00 03 02 00 52 A9 // power button released
+14:29:54:668	> Event: AA 00 03 00 02 00 FB  
+Command Complete.
+AA 00 03 02 00 51 AA 
+AA 00 03 02 00 52 A9 
+
+14:29:54:683	> Event: AA 00 03 00 02 00 FB  
+Command Complete.
+14:29:54:699	> Event: AA 00 03 01 02 00 FA 
+14:29:54:699	< Command: AA 00 02 14 01 E9  Event Acknowledge (0x14) -> Event ID
+Power on device.
+14:29:54:714	> Event: AA 00 03 01 0F 00 ED 
+14:29:54:714	< Command: AA 00 02 14 01 E9 	Event_ACK 
+Device under standby mode.
+14:29:54:730	> Event: AA 00 03 24 1E 01 BA 
+14:29:54:730	< Command: AA 00 02 14 24 C6 
+14:29:54:745	> Event: AA 00 03 2D 05 07 C4 
+14:29:54:745	< Command: AA 00 02 14 2D BD 
+14:29:54:761	> Event: AA 00 03 01 17 00 E5 
+14:29:54:761	< Command: AA 00 02 14 01 E9 
+14:29:55:355	> Event: AA 00 03 24 1E 00 BB 
+14:29:55:355	< Command: AA 00 02 14 24 C6 
+
+14:29:58:595	> Event: AA 00 03 23 00 00 DA 
+14:29:58:595	< Command: AA 00 02 14 23 C7 
+
+14:29:58:610	> Event: AA 00 03 01 15 00 E7 
+14:29:58:610	< Command: AA 00 02 14 01 E9 
+
+
+//"0xAA,0x00,0x03,0x02,0x00,0x51,0xAA"
+//PWR_CMD[0]=0xAA;
+//PWR_CMD[1]=0x00;
+//PWR_CMD[2]=0x03;
+//PWR_CMD[3]=0x02;
+//PWR_CMD[4]=0x00;
+//PWR_CMD[5]=0x51;
+//PWR_CMD[6]=0xAA;
+
+uint8_t PWR_PRESSED_CMD[7] = {0xAA,0x00,0x03,0x02,0x00,0x51,0xAA};
+uint8_t PWR_RELEASEED_CMD[7] = {0xAA,0x00,0x03,0x02,0x00,0x52,0xAA};
+
+ HAL_UART_Transmit(&huart1, (uint8_t *)PWR_PRESSED_CMD, sizeof(PWR_PRESSED_CMD),100);
+    HAL_UART_Transmit(&huart2, (uint8_t *)PWR_PRESSED_CMD, sizeof(PWR_PRESSED_CMD),100);
+
+    HAL_UART_Transmit(&huart1, (uint8_t *)PWR_RELEASEED_CMD, sizeof(PWR_RELEASEED_CMD),100);
+    HAL_UART_Transmit(&huart2, (uint8_t *)PWR_RELEASEED_CMD, sizeof(PWR_RELEASEED_CMD),100);

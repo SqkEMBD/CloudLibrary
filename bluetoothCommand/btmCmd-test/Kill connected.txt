@@ -1,0 +1,4 @@
+
+14:31:25:688	< Command: AA 00 02 18 0F D7 
+14:31:25:704	> Event: AA 00 03 00 18 00 E5 
+Command Complete.

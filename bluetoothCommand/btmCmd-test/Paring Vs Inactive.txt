@@ -1,0 +1,11 @@
+15:13:59:840	< Command: AA 00 03 02 00 5D 9E // Enter paring
+Fast enter pairing mode (from non-off mode)
+
+15:14:01:124	< Command: AA 00 03 02 00 6B 90 // Exit
+Exit pairing mode
+
+15:14:06:674	< Command: AA 00 03 13 03 00 E7 // Inactive 
+To force BTM into the non-connectable mode
+
+15:14:08:910	< Command: AA 00 03 13 03 01 E6 // Resume
+To resume BTM to the normal mode
