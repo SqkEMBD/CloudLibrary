@@ -50,9 +50,10 @@
 
 /* USER CODE BEGIN PRIVATE_TYPES */
 
+// defined maximum buffer data size at 64 bytes and and create array buffer to stored data from USB_HID_Terminal
+
 uint8_t buffer[64];
-uint8_t buffer_size = sizeof(buffer)/sizeof(buffer[0]);
-uint8_t usb_buffer[64];
+
 UART_HandleTypeDef huart1;
 
 /* USER CODE END PRIVATE_TYPES */
@@ -96,21 +97,21 @@ UART_HandleTypeDef huart1;
 __ALIGN_BEGIN static uint8_t CUSTOM_HID_ReportDesc_FS[USBD_CUSTOM_HID_REPORT_DESC_SIZE] __ALIGN_END =
 {
   /* USER CODE BEGIN 0 */
-		0x06, 0x00, 0xff, //Usage Page(Undefined )
-		0x09, 0x01, // USAGE (Undefined)
-		0xa1, 0x01, // COLLECTION (Application)
-		0x15, 0x00, // LOGICAL_MINIMUM (0)
-		0x26, 0xff, 0x00, // LOGICAL_MAXIMUM (255)
-		0x75, 0x08, // REPORT_SIZE (8)
-		0x95, 0x40, // REPORT_COUNT (64)
-		0x09, 0x01, // USAGE (Undefined)
-		0x81, 0x02, // INPUT (Data,Var,Abs)
-		0x95, 0x40, // REPORT_COUNT (64)
-		0x09, 0x01, // USAGE (Undefined)
-		0x91, 0x02, // OUTPUT (Data,Var,Abs)
-		0x95, 0x01, // REPORT_COUNT (1)
-		0x09, 0x01, // USAGE (Undefined)
-		0xb1, 0x02, // FEATURE (Data,Var,Abs)
+	0x06, 0x00, 0xff, //Usage Page(Undefined )
+	0x09, 0x01, // USAGE (Undefined)
+	0xa1, 0x01, // COLLECTION (Application)
+	0x15, 0x00, // LOGICAL_MINIMUM (0)
+	0x26, 0xff, 0x00, // LOGICAL_MAXIMUM (255)
+	0x75, 0x08, // REPORT_SIZE (8)
+	0x95, 0x40, // REPORT_COUNT (64)
+	0x09, 0x01, // USAGE (Undefined)
+	0x81, 0x02, // INPUT (Data,Var,Abs)
+	0x95, 0x40, // REPORT_COUNT (64)
+	0x09, 0x01, // USAGE (Undefined)
+	0x91, 0x02, // OUTPUT (Data,Var,Abs)
+	0x95, 0x01, // REPORT_COUNT (1)
+	0x09, 0x01, // USAGE (Undefined)
+	0xb1, 0x02, // FEATURE (Data,Var,Abs)
   /* USER CODE END 0 */
   0xC0    /*     END_COLLECTION	             */
 };
@@ -195,16 +196,25 @@ static int8_t CUSTOM_HID_DeInit_FS(void)
   * @param  event_idx: Event index
   * @param  state: Event state
   * @retval USBD_OK if all operations are OK else USBD_FAIL
+  *
+  *
+  * function CUSTOM_HID_OutEvent_FS(uint8_t* state)
+  *
+  *
+  *
   */
 static int8_t CUSTOM_HID_OutEvent_FS(uint8_t* state)
 {
 	/* USER CODE BEGIN 6 */
 
-
+	// Copy Received data to the buffer
 	memcpy(buffer, state, 64 * sizeof(uint8_t));
-	USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS,(uint8_t*)buffer,64); // PC HID Terminal
 
-	USBD_Changename(buffer);
+	// this function return data was sent from HID Terminal to display on "received data" box
+	USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS,(uint8_t*)buffer,64);
+
+	// send an array of data to process and Set the new Bluetooth device name
+	USBD_HID_SetBluetoothname(buffer);
 
 	return (0);
   /* USER CODE END 6 */
@@ -227,6 +237,8 @@ static int8_t USBD_CUSTOM_HID_SendReport_FS(uint8_t *report, uint16_t len)
 
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
 
+
+
 uint8_t calculateChecksum(uint8_t* startByte, uint8_t* endByte)
 {
     uint8_t checksum = 0;
@@ -239,45 +251,38 @@ uint8_t calculateChecksum(uint8_t* startByte, uint8_t* endByte)
     return checksum;
 }
 
-void MCU_UART_Transmit(uint8_t *Data, uint16_t dataSize)
+void USBD_HID_SetBluetoothname(uint8_t* usbbuffer)
 {
-    for(uint16_t i = 0; i < dataSize; i++)
-    {
-	      HAL_UART_Transmit(&huart1, &Data[i], 1, 50);
-    }
-}
+	uint8_t Packet[64];
 
-void USBD_Changename(uint8_t* usbbuffer)
-{
-	uint8_t buffer[32];
-	uint8_t* ptr_packet_len = &usbbuffer[0]; // ptr to Add:usbbuffer[0] -> len
-	uint8_t packet_len = *(ptr_packet_len) + 1 ;  // ptr to uint8_t 1-> cmdID
+	// usbbuffer[0] stored data of len that received from USB Terminal and plus UART command_id stored 1 Byte.
+	uint8_t command_len 		= 	usbbuffer[0] + 1U;
 
+	// Packet[Checksum_Position] is a position of the checksum is next by 3 Bytes from the command length
+	uint8_t chksum_pos 			= 	command_len  + 3U;
 
-	uint8_t crc_pos = packet_len+3;
+	// Packet[end_of_packet] is the last index of an array are transmitted by UART
+	uint8_t packet_end 			= 	chksum_pos   + 1U;
 
-	buffer[0] = 0xAA;
-	buffer[1] = 0x00;
-	buffer[2] = packet_len; 	// Data_len
-	buffer[3] = 0x05; 			// BTM CMD_ID
-	memcpy(buffer + 4, &usbbuffer[1], packet_len+4 );
+	Packet[0] = 0xAA;			// BT_Module UART Packet Header
+	Packet[1] = 0x00;			// Packet Lenth *MSB*
+	Packet[2] = command_len; 	// Packet Lenth *LSB* -> Command_ID (1 Byte) + Parameters (Shouldn't over 32 Bytes)
+	Packet[3] = 0x05; 			// UART Command 0x05 *Change Bluetooth device name on discovery mode*
 
-//	buffer[crc_pos] = 'X';
-	buffer[crc_pos] = calculateChecksum(&buffer[2], &buffer[packet_len+3]) ; // CRC
+	// copy buffer that receives from USB to new buffer to send via UART Protocol.
+	memcpy(&Packet[4] , &usbbuffer[1], chksum_pos);
 
-	uint8_t packet_end = crc_pos+1;
+	// Add checksum at the tail of the UART Packet.
+	Packet[chksum_pos] = calculateChecksum(&Packet[2], &Packet[packet_end]);
 
-//	uint8_t checksum = calculateChecksum(&buffer[2], &buffer[end_packet]) ; // CRC
-//	uint8_t checksum = 'X';
-
+	// Transmit Command Packet via MCU UART
+	// from head(packet[0]) to the tail(checksum)
 	for(uint8_t i = 0; i < packet_end; i++)
 	{
-		HAL_UART_Transmit(&huart1, &buffer[i], 1, 100);
+		HAL_UART_Transmit(&huart1, &Packet[i], 1, 100);
 	}
 
-
 }
-
 
 
 
