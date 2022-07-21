@@ -2,7 +2,7 @@
 /**
   ******************************************************************************
   * @file           : usbd_custom_hid_if.h
-  * @version        : v2.0_Cube
+  * @version        : v3.0_Cube
   * @brief          : Header for usbd_custom_hid_if.c file.
   ******************************************************************************
   * @attention
@@ -104,11 +104,8 @@ extern USBD_CUSTOM_HID_ItfTypeDef USBD_CustomHID_fops_FS;
   */
 
 /* USER CODE BEGIN EXPORTED_FUNCTIONS */
-
 uint8_t calculateChecksum(uint8_t* startByte, uint8_t* endByte);
-void MCU_UART_Transmit(uint8_t *Data, uint16_t dataSize);
 void USBD_HID_SetBluetoothname(uint8_t* usbbuffer);
-
 
 /* USER CODE END EXPORTED_FUNCTIONS */
 

@@ -2,7 +2,7 @@
 /**
   ******************************************************************************
   * @file           : usbd_conf.h
-  * @version        : v2.0_Cube
+  * @version        : v3.0_Cube
   * @brief          : Header for usbd_conf.c file.
   ******************************************************************************
   * @attention
@@ -30,15 +30,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "main.h"
-#include "stm32f1xx.h"
-#include "stm32f1xx_hal.h"
+#include "stm32g0xx.h"
+#include "stm32g0xx_hal.h"
 
 /* USER CODE BEGIN INCLUDE */
 
 /* USER CODE END INCLUDE */
 
 /** @addtogroup USBD_OTG_DRIVER
+  * @brief Driver for Usb device.
   * @{
   */
 
@@ -52,6 +52,9 @@
   * @{
   */
 
+/* Private variables ---------------------------------------------------------*/
+/* USER CODE BEGIN PV */
+/* USER CODE END PV */
 /**
   * @}
   */
@@ -62,21 +65,23 @@
   */
 
 /*---------- -----------*/
-#define USBD_MAX_NUM_INTERFACES     1
+#define USBD_MAX_NUM_INTERFACES     1U
 /*---------- -----------*/
-#define USBD_MAX_NUM_CONFIGURATION     1
+#define USBD_MAX_NUM_CONFIGURATION     1U
 /*---------- -----------*/
-#define USBD_MAX_STR_DESC_SIZ     512
+#define USBD_MAX_STR_DESC_SIZ     512U
 /*---------- -----------*/
-#define USBD_DEBUG_LEVEL     0
+#define USBD_DEBUG_LEVEL     0U
 /*---------- -----------*/
-#define USBD_SELF_POWERED     1
+#define USBD_LPM_ENABLED     1U
 /*---------- -----------*/
-#define USBD_CUSTOMHID_OUTREPORT_BUF_SIZE     64
+#define USBD_SELF_POWERED     1U
 /*---------- -----------*/
-#define USBD_CUSTOM_HID_REPORT_DESC_SIZE     33
+#define USBD_CUSTOMHID_OUTREPORT_BUF_SIZE     64U
 /*---------- -----------*/
-#define CUSTOM_HID_FS_BINTERVAL     0x5
+#define USBD_CUSTOM_HID_REPORT_DESC_SIZE     33U
+/*---------- -----------*/
+#define CUSTOM_HID_FS_BINTERVAL     0x5U
 
 /****************************************/
 /* #define for FS and HS identification */
@@ -91,27 +96,21 @@
   * @{
   */
 
-/* Memory management macros */
-
+/* Memory management macros make sure to use static memory allocation */
 /** Alias for memory allocation. */
-#define USBD_malloc         (uint32_t *)USBD_static_malloc
+#define USBD_malloc         (void *)USBD_static_malloc
 
 /** Alias for memory release. */
 #define USBD_free           USBD_static_free
 
 /** Alias for memory set. */
-#define USBD_memset         /* Not used */
+#define USBD_memset         memset
 
 /** Alias for memory copy. */
-#define USBD_memcpy         /* Not used */
+#define USBD_memcpy         memcpy
 
 /** Alias for delay. */
 #define USBD_Delay          HAL_Delay
-
-/* For footprint reasons and since only one allocation is handled in the HID class
-   driver, the malloc/free is changed into a static allocation method */
-void *USBD_static_malloc(uint32_t size);
-void USBD_static_free(void *p);
 
 /* DEBUG macros */
 
@@ -158,6 +157,8 @@ void USBD_static_free(void *p);
   */
 
 /* Exported functions -------------------------------------------------------*/
+void *USBD_static_malloc(uint32_t size);
+void USBD_static_free(void *p);
 
 /**
   * @}

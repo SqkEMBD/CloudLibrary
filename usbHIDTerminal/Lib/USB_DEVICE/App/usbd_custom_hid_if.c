@@ -2,7 +2,7 @@
 /**
   ******************************************************************************
   * @file           : usbd_custom_hid_if.c
-  * @version        : v2.0_Cube
+  * @version        : v3.0_Cube
   * @brief          : USB Device Custom HID interface file.
   ******************************************************************************
   * @attention
@@ -32,6 +32,10 @@
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
 
+uint8_t buffer[64];
+// External variable
+UART_HandleTypeDef huart2;
+
 /* USER CODE END PV */
 
 /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
@@ -49,12 +53,6 @@
   */
 
 /* USER CODE BEGIN PRIVATE_TYPES */
-
-// defined maximum buffer data size at 64 bytes and and create array buffer to stored data from USB_HID_Terminal
-
-uint8_t buffer[64];
-
-UART_HandleTypeDef huart1;
 
 /* USER CODE END PRIVATE_TYPES */
 
@@ -96,7 +94,7 @@ UART_HandleTypeDef huart1;
 /** Usb HID report descriptor. */
 __ALIGN_BEGIN static uint8_t CUSTOM_HID_ReportDesc_FS[USBD_CUSTOM_HID_REPORT_DESC_SIZE] __ALIGN_END =
 {
-  /* USER CODE BEGIN 0 */
+	/* USER CODE BEGIN 0 */
 	0x06, 0x00, 0xff, //Usage Page(Undefined )
 	0x09, 0x01, // USAGE (Undefined)
 	0xa1, 0x01, // COLLECTION (Application)
@@ -112,17 +110,13 @@ __ALIGN_BEGIN static uint8_t CUSTOM_HID_ReportDesc_FS[USBD_CUSTOM_HID_REPORT_DES
 	0x95, 0x01, // REPORT_COUNT (1)
 	0x09, 0x01, // USAGE (Undefined)
 	0xb1, 0x02, // FEATURE (Data,Var,Abs)
-  /* USER CODE END 0 */
-  0xC0    /*     END_COLLECTION	             */
+	 /* USER CODE END 0 */
+	 0xC0 /* END_COLLECTION */
 };
 
 /* USER CODE BEGIN PRIVATE_VARIABLES */
 
-
-
-
 /* USER CODE END PRIVATE_VARIABLES */
-
 
 /**
   * @}
@@ -149,6 +143,13 @@ extern USBD_HandleTypeDef hUsbDeviceFS;
 static int8_t CUSTOM_HID_Init_FS(void);
 static int8_t CUSTOM_HID_DeInit_FS(void);
 static int8_t CUSTOM_HID_OutEvent_FS(uint8_t* state);
+#ifdef USBD_CUSTOMHID_CTRL_REQ_COMPLETE_CALLBACK_ENABLED
+static int8_t CUSTOM_HID_CtrlReqComplete_FS(uint8_t request, uint16_t wLength);
+#endif /* USBD_CUSTOMHID_CTRL_REQ_COMPLETE_CALLBACK_ENABLED */
+
+#ifdef USBD_CUSTOMHID_CTRL_REQ_GET_REPORT_ENABLED
+static uint8_t *CUSTOM_HID_GetReport_FS(uint16_t *ReportLength);
+#endif /* USBD_CUSTOMHID_CTRL_REQ_GET_REPORT_ENABLED */
 
 /**
   * @}
@@ -159,7 +160,13 @@ USBD_CUSTOM_HID_ItfTypeDef USBD_CustomHID_fops_FS =
   CUSTOM_HID_ReportDesc_FS,
   CUSTOM_HID_Init_FS,
   CUSTOM_HID_DeInit_FS,
-  CUSTOM_HID_OutEvent_FS
+  CUSTOM_HID_OutEvent_FS,
+#ifdef USBD_CUSTOMHID_CTRL_REQ_COMPLETE_CALLBACK_ENABLED
+  CUSTOM_HID_CtrlReqComplete_FS,
+#endif /* USBD_CUSTOMHID_CTRL_REQ_COMPLETE_CALLBACK_ENABLED */
+#ifdef USBD_CUSTOMHID_CTRL_REQ_GET_REPORT_ENABLED
+  CUSTOM_HID_GetReport_FS,
+#endif /* USBD_CUSTOMHID_CTRL_REQ_GET_REPORT_ENABLED */
 };
 
 /** @defgroup USBD_CUSTOM_HID_Private_Functions USBD_CUSTOM_HID_Private_Functions
@@ -196,27 +203,24 @@ static int8_t CUSTOM_HID_DeInit_FS(void)
   * @param  event_idx: Event index
   * @param  state: Event state
   * @retval USBD_OK if all operations are OK else USBD_FAIL
-  *
-  *
-  * function CUSTOM_HID_OutEvent_FS(uint8_t* state)
-  *
-  *
-  *
   */
 static int8_t CUSTOM_HID_OutEvent_FS(uint8_t* state)
 {
-	/* USER CODE BEGIN 6 */
+  /* USER CODE BEGIN 6 */
+  UNUSED(event_idx);
+  UNUSED(state);
 
-	// Copy Received data to the buffer
-	memcpy(buffer, state, 64 * sizeof(uint8_t));
+  // Copy Received data to the buffer
+  memcpy(buffer, state, 64 * sizeof(uint8_t));
 
-	// this function return data was sent from HID Terminal to display on "received data" box
-	USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS,(uint8_t*)buffer,64);
+  // this function return data was sent from HID Terminal to display on "received data" box
+  USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS,(uint8_t*)buffer,64);
 
-	// send an array of data to process and Set the new Bluetooth device name
-	USBD_HID_SetBluetoothname(buffer);
+  // send an array of data to process and Set the new Bluetooth device name
+  USBD_HID_SetBluetoothname(buffer);
 
-	return (0);
+  return (0);
+
   /* USER CODE END 6 */
 }
 
@@ -233,11 +237,6 @@ static int8_t USBD_CUSTOM_HID_SendReport_FS(uint8_t *report, uint16_t len)
   return USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, report, len);
 }
 */
-/* USER CODE END 7 */
-
-/* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
-
-
 
 uint8_t calculateChecksum(uint8_t* startByte, uint8_t* endByte)
 {
@@ -279,12 +278,61 @@ void USBD_HID_SetBluetoothname(uint8_t* usbbuffer)
 	// from head(packet[0]) to the tail(checksum)
 	for(uint8_t i = 0; i < packet_end; i++)
 	{
-		HAL_UART_Transmit(&huart1, &Packet[i], 1, 100);
+		HAL_UART_Transmit(&huart2, &Packet[i], 1, 100);
 	}
 
 }
 
+/* USER CODE END 7 */
 
+#ifdef USBD_CUSTOMHID_CTRL_REQ_COMPLETE_CALLBACK_ENABLED
+/**
+  * @brief  CUSTOM_HID_CtrlReqComplete_FS
+  *         Manage the CUSTOM HID control request complete
+  * @param  request: control request
+  * @param  wLength: request wLength
+  * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL
+  */
+static int8_t CUSTOM_HID_CtrlReqComplete_FS(uint8_t request, uint16_t wLength)
+{
+  UNUSED(wLength);
+
+  switch (request)
+  {
+    case CUSTOM_HID_REQ_SET_REPORT:
+
+      break;
+
+    case CUSTOM_HID_REQ_GET_REPORT:
+
+      break;
+
+    default:
+      break;
+  }
+
+  return (0);
+}
+#endif /* USBD_CUSTOMHID_CTRL_REQ_COMPLETE_CALLBACK_ENABLED */
+
+#ifdef USBD_CUSTOMHID_CTRL_REQ_GET_REPORT_ENABLED
+/**
+  * @brief  CUSTOM_HID_GetReport_FS
+  *         Manage the CUSTOM HID control Get Report request
+  * @param  event_idx: event index
+  * @param  state: event state
+  * @retval return pointer to HID report
+  */
+static uint8_t *CUSTOM_HID_GetReport_FS(uint16_t *ReportLength)
+{
+  UNUSED(ReportLength);
+  uint8_t *pbuff;
+
+  return (pbuff);
+}
+#endif /* USBD_CUSTOMHID_CTRL_REQ_GET_REPORT_ENABLED */
+
+/* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
 
 /* USER CODE END PRIVATE_FUNCTIONS_IMPLEMENTATION */
 /**
