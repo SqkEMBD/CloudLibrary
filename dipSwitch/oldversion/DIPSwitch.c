@@ -1,13 +1,17 @@
 /*
- * DIPSwitch.h
+ * DIPSwitch.c
  *
- *  Created on: Jul 18, 2022
+ *  Created on: Jul 22, 2022
  *  Latest modified on: Jul 22, 2022
  *      Author: Amornsak <amornsak-ra@starsmicro.com>
  */
 
 #include "DIPSwitch.h"
 
+// Basic GPIO definition
+// Consists of a port and a pin using the HAL type definitions of these
+// HAL abstractions
+//
 uint32_t getDipSwitchValue(const GPIO_DEFINITION *defs, int size)
 {
     // Build up an up-to 32 bit unsigned integer value, based on 1 or more
@@ -35,10 +39,10 @@ uint32_t getDipSwitchValue(const GPIO_DEFINITION *defs, int size)
     return result;
 }
 
-bool getSecuredState(void)
+uint8_t getSecuredState()
 {
-	bool state = -1;
-	if(HAL_GPIO_ReadPin(SECURE_GPIO_Port, SECURE_Pin) == GPIO_PIN_RESET)
+	uint8_t state = -1;
+	if(HAL_GPIO_ReadPin(Secure_GPIO_Port, Secure_Pin) == GPIO_PIN_RESET)
 	{
 		return state = 1;
 	}
@@ -49,7 +53,7 @@ bool getSecuredState(void)
 
 }
 
-uint8_t getRFPowerIndex(void)
+uint8_t getRFPowerIndex()
 {
     static const GPIO_DEFINITION defs[3] =
     {
@@ -58,11 +62,11 @@ uint8_t getRFPowerIndex(void)
 		{ RF_PO_0_GPIO_Port, RF_PO_0_Pin }
     };
 
-    return (uint8_t)( (getDipSwitchValue(defs,3) + 1UL) & 0xFF);
-    // return (uint8_t)( (getDipSwitchValue(defs,3) ) & 0xFF);
+//    return (uint8_t)( (getDipSwitchValue(defs,3) + 1UL) & 0xFF);
+    return (uint8_t)( (getDipSwitchValue(defs,3) ) & 0xFF);
 }
 
-uint8_t getBTId(void)
+uint8_t getBTId()
 {
     static const GPIO_DEFINITION defs[4] =
     {
@@ -74,7 +78,7 @@ uint8_t getBTId(void)
     };
 
     // Note: Add 1 to the result, to get an index between 1 and 16
-
+    //
     return (uint8_t)((getDipSwitchValue(defs, 4) + 1UL) & 0XFF);
-//    return (uint8_t)((getDipSwitchValue(defs, 4) ) & 0XFF);
+    // return (uint8_t)((getDipSwitchValue(defs, 4) ) & 0XFF);
 }

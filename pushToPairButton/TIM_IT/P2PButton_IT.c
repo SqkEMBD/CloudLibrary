@@ -32,11 +32,12 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
 
   // Declare startTime at 0
   const uint8_t startTime = 0;
+  bool securedState = getSecuredState();
 
   // External interrupt with falling edge trigger detection **button active low**
   // Check interrupt pin
   // Check secure mode status
-  if( ( GPIO_Pin == BUTTON_Pin ) && ( secureMode == SECURE_MODE_ON ) )
+  if( ( GPIO_Pin == BUTTON_Pin ) && ( securedState == SECURE_MODE_ON ) )
   {
 
     // Clear EXTI flags.
@@ -46,10 +47,10 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
     buttondown_TIMCNT = startTime;
 
     // Start timer (TIM2) with interrupt mode.
-    HAL_TIM_Base_Start_IT(&htim2);
+    HAL_TIM_Base_Start_IT(&htim3);
 
     // Toggle Led for indicating when the button is pressed.
-    HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+    // HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
 
   }
 
@@ -67,20 +68,22 @@ void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin)
   // Debouncing button switch with 10 ms delay.
   HAL_Delay(10);
 
+
+  bool securedState = getSecuredState();
   // External interrupt with Rising edge trigger detection **button active low**
   // Check interrupt pin
   // Check secure mode status
-  if( ( GPIO_Pin == BUTTON_Pin ) && ( secureMode == SECURE_MODE_ON ) )
+  if( ( GPIO_Pin == BUTTON_Pin ) && ( securedState == SECURE_MODE_ON ) )
   {
 
       // Clear EXTI flags
       if(__HAL_GPIO_EXTI_GET_RISING_IT(BUTTON_Pin) != RESET) __HAL_GPIO_EXTI_CLEAR_RISING_IT(BUTTON_Pin);
 
       // Stop timer (TIM2) with interrupt mode
-      HAL_TIM_Base_Stop_IT(&htim2);
+      HAL_TIM_Base_Stop_IT(&htim3);
 
       // Toggle Led for indicating when the button is not pressed down
-      HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+      // HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
 
       // Declare variables to define button operate time
       const uint8_t startTime = 0;
@@ -129,7 +132,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   /*Prevent unused argument(s) compilation warning*/
   UNUSED(htim);
 
-  if (htim->Instance == TIM2)
+  if (htim->Instance == TIM3)
   {
     // Count up buttondown_TIMCNT variable every 1 sec period elapsed.
     buttondown_TIMCNT += 1;
