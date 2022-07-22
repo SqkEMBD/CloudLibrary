@@ -1,4 +1,22 @@
-//
+/*
+ * P2PButton_IT.c
+ *
+ *  Created on: Jul 22, 2022
+ *  Latest modified on: Jul 22, 2022
+ *      Author: Amornsak <amornsak-ra@starsmicro.com>
+ */
+
+#include "P2PButton_IT.h"
+
+
+//*** Global Variables
+// variable stored value of the counter when the button is pressed down
+static uint16_t buttondown_TIMCNT = -1;
+
+// variable stored value of boolean logic of *Secure pin*
+static bool secureMode = 1; // assume that true for testing
+
+
 
 void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
 {
@@ -101,7 +119,7 @@ void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin)
 	      buttondown_TIMCNT = startTime;
       }
 
-   }
+	}
 
 }
 
@@ -116,3 +134,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     // Count up buttondown_TIMCNT variable every 1 sec period elapsed.
     buttondown_TIMCNT += 1;
   }
+
+  /* NOTE : This function should not be modified, when the callback is needed,
+		the HAL_TIM_PeriodElapsedCallback could be implemented in the user file
+  */
+}

@@ -1,3 +1,11 @@
+/*
+ * BTM_command.h
+ *
+ *  Created on: Jul 22, 2022
+ *  Latest modified on: Jul 22, 2022
+ *      Author: Amornsak <amornsak-ra@starsmicro.com>
+ */
+
 #ifndef __BTM_COMMAND_H__
 #define __BTM_COMMAND_H__
 
@@ -55,7 +63,6 @@ void BTM_Linkback_Lastdevice();
 // Send UART Command function
 uint8_t calculateChecksum(uint8_t *startByte, uint8_t *endByte);
 void MCU_UART_sendData(uint8_t *Data, uint16_t dataSize);
-
 
 
 #endif // __BTM_COMMAND_H__

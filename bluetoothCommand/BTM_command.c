@@ -1,3 +1,11 @@
+/*
+ * BTM_command.c
+ *
+ *  Created on: Jul 22, 2022
+ *  Latest modified on: Jul 22, 2022
+ *      Author: Amornsak <amornsak-ra@starsmicro.com>
+ */
+
 #include "BTM_command.h"
 
 /***************************************************************************

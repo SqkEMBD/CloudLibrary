@@ -1,3 +1,11 @@
+/*
+ * DIPSwitch.c
+ *
+ *  Created on: Jul 22, 2022
+ *  Latest modified on: Jul 22, 2022
+ *      Author: Amornsak <amornsak-ra@starsmicro.com>
+ */
+
 #include "DIPSwitch.h"
 
 // Basic GPIO definition
@@ -71,6 +79,6 @@ uint8_t getBTId()
 
     // Note: Add 1 to the result, to get an index between 1 and 16
     //
-//    return (uint8_t)((getDipSwitchValue(defs, 4) + 1UL) & 0XFF);
-    return (uint8_t)((getDipSwitchValue(defs, 4) ) & 0XFF);
+    return (uint8_t)((getDipSwitchValue(defs, 4) + 1UL) & 0XFF);
+    // return (uint8_t)((getDipSwitchValue(defs, 4) ) & 0XFF);
 }
