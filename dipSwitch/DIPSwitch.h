@@ -14,6 +14,15 @@
 
 // user library includes
 
+// Basic GPIO definition
+// Consists of a port and a pin using the HAL type definitions of these
+// HAL abstractions
+typedef struct
+{
+    GPIO_TypeDef *port;
+    uint16_t pin;
+} GPIO_DEFINITION;
+
 uint32_t getDipSwitchValue(const GPIO_DEFINITION *defs, int size);
 uint8_t getSecuredState();
 uint8_t getRFPowerIndex();
